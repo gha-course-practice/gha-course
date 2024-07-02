@@ -8,13 +8,13 @@ jobs:
             - name: Setting an error message
               run: echo "::error::Migging semicolon"
             - name: Setting an error message with parameters
-              run: echo "::error title::Error title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
+              run: echo "::error title=Error title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
             - name: Setting an debug message with parameters
-              run: echo "::debug title::Debug title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
+              run: echo "::debug title=Debug title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
             - name: Setting an warning message with parameters
-              run: echo "::warning title::Warning title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
+              run: echo "::warning title=Warning title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
             - name: Setting an notice message with parameters
-              run: echo "::notice title::Notice title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
+              run: echo "::notice title=Notice title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
             - name: Group of logs
               run: |
                 echo "::group::Cosas agrupadas que molan"
