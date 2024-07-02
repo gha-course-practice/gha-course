@@ -15,3 +15,13 @@ jobs:
               run: echo "::warning title::Warning title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
             - name: Setting an notice message with parameters
               run: echo "::notice title::Notice title, file=src/test.js,line=2,endLine=5,col=5,endColumn=7::Missing an ass"
+            - name: Group of logs
+              run: |
+                echo "::group::Cosas agrupadas que molan"
+                echo "Dentro del grupo"
+                echo "Lechuga"
+                echo "::endgroup::"
+            - name: Maskinga value
+              run: echo "::add-mask::973294729074392037490273490872390472"
+            - name: echo a secret
+              run: echo "973294729074392037490273490872390472"
