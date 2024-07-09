@@ -1,8 +1,26 @@
 name: Repository Events
 on: 
   push:
+    # All rules should be matched to run the workflow
+    branches:
+      - main
+      - "feature/*"   # matches feature/featA, feature/featB, does not match feature/featA/featB
+      - "feature/**"  # matches feature/featA, feature/featB, an also feature/featA/featB
+      - "!feature/featA"  # excludes this branch. The order is important. The last rule is what is done.
+#    branches-ignore:
+#      - develop
+    tags: 
+      - v1.* # match v1.1, v1.1.2...
+      - "!v1.1.1"
+    paths:
+      - "**.js"
+      - "!app.js"   # excludes this file
   pull_request:
     types: [opened, assigned, reopened, synchronize]
+    branches:
+      - main
+    paths: 
+      - "**.js"
   issues:
     types: [opened]
 
