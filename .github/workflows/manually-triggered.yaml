@@ -1,9 +1,44 @@
 name: Manually Triggered
 on:
     workflow_dispatch:
+        inputs:
+            texto:
+                description: Un campo de texto
+                type: string
+                required: true
+                default: "Valor por defecto"
+            numero:
+                description: Un campo numérico
+                type: number
+                default: 5
+            opciones:
+                description: Múltiples opciones
+                required: true
+                default: "Tercera Opción"
+                type: choice
+                options:
+                    - Primera Opción
+                    - Segunda Opción
+                    - Tercera Opción
+            booleano:
+                description: Un campo verdadero o falso
+                required: false
+                type: boolean
+            entorno:
+                description: "Entorno"
+                type: environment
+                required: true
+
+
 
 jobs:
     log-info:
         runs-on: ubuntu-latest
         steps:
             - run: echo $GITHUB_REF
+            - run: |
+                echo "Texto: ${{ inputs.texto }}"
+                echo "Número: ${{ inputs.numero }}"
+                echo "Opción: ${{ inputs.opciones }}"
+                echo "Booleano: ${{ inputs.booleano }}"
+                echo "Entorno: ${{ inputs.entorno }}"
