@@ -68,9 +68,9 @@ jobs:
             - name: Dump Contexts
               # Here we use a function (toJson) to explore content of some contexts
               run: |
-                echo ${{ toJson(github) }}
-                echo ${{ toJson(job) }}
-                echo ${{ toJson(secrets) }}
-                echo ${{ toJson(steps) }}
-                echo ${{ toJson(runner) }}
+                echo '${{ toJson(github) }}'
+                echo '${{ toJson(job) }}'
+                echo '${{ toJson(secrets) }}'
+                echo '${{ toJson(steps) }}'
+                echo '${{ toJson(runner) }}'
 ```
