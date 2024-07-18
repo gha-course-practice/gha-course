@@ -104,3 +104,50 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name == 'push' # This job will be executed only with push event
 ```
+You can use also if at a step level.
+
+## Functions
+
+
+### contains
+Functions that checks if a string is contained in another one. 
+
+```js
+contains(string, searched_string)
+```
+
+### Using an array with contains
+
+```js
+// First you need an array:
+
+["first_value", "second_value"]
+
+// You need no stringify this array with fromJson function
+
+fromJson('["first_value", "second_value"]')     // See the use of simple quotation marks
+
+// Te result is this
+contains(fromJson('["first_value", "second_value"]'), "searched_string")        // false
+contains(fromJson('["first_value", "second_value"]'), "second_value")           // true
+
+```
+
+### Access properties of an array of objects
+
+If, for example, our workflow is launched by the creation or modification of an issue, this issue can have multiple labels. So inside the **github** context we can access the issue data through **github.events.issue**. Inside this theres one array of objets called **labels**. Every label has different properties (for example name). If we want to check if any label name of an issue is 'bug' (or any other string) an option is to get an array of all the names inside de **labels** array. We do this with this special syntax:
+
+```js
+    github.event.issue.labels.*.name            // This returns an array of names. ['bug', 'other', 'anything']
+```
+
+### Join
+
+Joins in a string every member of an array seperated by a character
+
+```js
+    join(array, separator)
+
+    join(github.event.issue.labels.*.name, ',')
+    join(github.event.issue.labels.*.name, '||')
+```
