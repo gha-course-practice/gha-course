@@ -106,6 +106,27 @@ jobs:
 ```
 You can use also if at a step level.
 
+### Success
+
+Github actions applies success condition to all if key by default. If we have this **if** key:
+
+```yaml
+if: steps.step-2.conclusion == 'failure'
+```
+
+Github Actions will _translate_ to something like this:
+
+```yaml
+if: success() && steps.step-2.conclusion == 'failure'
+```
+
+So if we need to apply this kind of condition you need to explicitly check for failure():
+
+```yaml
+if: failure() && steps.step-2.conclusion == 'failure'
+```
+
+
 ## Functions
 
 
@@ -151,3 +172,5 @@ Joins in a string every member of an array seperated by a character
     join(github.event.issue.labels.*.name, ',')
     join(github.event.issue.labels.*.name, '||')
 ```
+
+## Only execute steps depending on result (status) of previous steps
