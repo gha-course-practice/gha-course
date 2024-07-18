@@ -74,3 +74,33 @@ jobs:
                 echo '${{ toJson(steps) }}'
                 echo '${{ toJson(runner) }}'
 ```
+
+## The IF key
+
+Can be used in a job level or in a step level.
+
+In a job level it's used like this:
+
+```yaml
+name: Expressions & Contexts
+on: [push, pull_request, issues, workflow_dispatch]
+run-name: 'Expressions & Contexts by @${{ github.actor }}, event ${{ github.event_name }}'
+
+jobs:
+    using-expressions-and-contexts:
+        runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'push' }}  # This job will be executed only with push event
+```
+
+But we don't need to use the **${{ }}** syntax because Github actions will understand that everything in the IF is an expression.
+
+```yaml
+name: Expressions & Contexts
+on: [push, pull_request, issues, workflow_dispatch]
+run-name: 'Expressions & Contexts by @${{ github.actor }}, event ${{ github.event_name }}'
+
+jobs:
+    using-expressions-and-contexts:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'push' # This job will be executed only with push event
+```
