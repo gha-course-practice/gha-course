@@ -269,3 +269,48 @@ jobs:
 We can use environment variables in 2 different ways. 
 - $NAME_OF_VARIABLE. If we use this way the variable is evaluated inside the running machine.
 - ${{ env.NAME_OF_VARIABLE }}. If we use this other method the variable is evaluated in Github Actions and then passed to the running machine. Using this method we can use environment variables inside **if** tag in the yaml.
+
+### How to create a new variable or set a variable value while executing a workflow
+
+For creating a new environment variable, or change the value of an existing one, inside the execution of a workflow, we need to add this variable or new value to a special file. We can access this file using the environment variable $GITHUB_ENV. Here's how we do this in bash:
+
+#### Create new variable (or change the value)
+
+```bash
+echo "NEW_ENV_VAR=$(date)" >> "$GITHUB_ENV"
+```
+
+```powershell
+"NEW_ENV_VAR=${date}" | Out-File -FilePath $env:GITHUB_ENV -Append
+```
+
+In the example below we created a new environment variable NEW_ENV_VAR and assign to it the value $(date) -which called the date function and get the time in the execution-.
+
+#### Multiple lines values
+
+For multiline strings, you may use a delimiter with the following syntax.
+
+{name}<<{delimiter}
+{value}
+{delimiter}
+
+Example in bash:
+
+```bash
+# For security reasons web create a random delimiter
+DELIMITER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+# Here we start the multi line value for the environment variable RANDOM_JOKE
+echo "RANDOM_JOKE<<$DELIMITER" >> "$GITHUB_ENV"
+echo "Here is a joke:" >> "$GITHUB_ENV"
+curl -s https://icanhazdadjoke.com/ >> "$GITHUB_ENV"
+# It's important to separate the end delimiter in a new line
+echo "" >> "$GITHUB_ENV"
+echo "$DELIMITER" >> "$GITHUB_ENV"
+```
+
+Example in powershell
+
+[TO DO]
+
+
+
