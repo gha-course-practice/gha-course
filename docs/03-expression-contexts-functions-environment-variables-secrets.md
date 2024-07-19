@@ -174,3 +174,39 @@ Joins in a string every member of an array seperated by a character
 ```
 
 ## Only execute steps depending on result (status) of previous steps
+
+```yaml
+name: Status Check Functions
+on: [push]
+
+jobs:
+  job-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: sleep 20
+      - name: Step 2
+        id: step-2
+        run: exit 1
+      - name: Runs on Failure
+        if: failure() && steps.step-2.conclusion == 'failure'
+        run: echo 'Step 2 has failed.'
+      - name: Runs on success
+        # this is not needed beacuse this is the default behaviour.
+        if: success()
+        run: echo 'Runs on Success'
+      - name: Always Runs
+        # if: success() || failure()
+        if: always()
+        run: echo 'Always runs'
+      - name: Runs When Cancelled
+        if: cancelled()
+        run: echo 'Runs on cancelled'
+  job-2:
+    runs-on: ubuntu-latest
+    needs: job-1
+    # only runs if job-1 fails
+    if: failure()         
+    steps: 
+      - run: echo 'Job 2'
+```
