@@ -210,3 +210,62 @@ jobs:
     steps: 
       - run: echo 'Job 2'
 ```
+
+## Environment variables
+
+In Github Actions there are default environment variables. The documentation for this variables is [here] (https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables).
+
+### User defined environment varibles.
+
+Can be created by en **env** tag at workflow level, at job level and also at step level.
+
+```yaml
+env:
+  WF_LEVEL_ENV: Available to all jobs
+```
+
+An environment variable defined at workflow level can be used inside any step of any job in the workflow. If it's defined at job level this variable can be used in ll steps of this job, but not in another job. One variable defined at step level can only be used in this steps.
+
+A environment variable can be overriden in a lower level.
+
+Here's one example:
+
+```yaml
+name: Environment Variables
+on: [push]
+
+# Define environment variables at workflow level available in all jobs
+env:
+  WF_LEVEL_ENV: Available to all jobs
+
+jobs:
+  env-vars-and-context:
+    runs-on: ubuntu-latest
+    # Here we need to use context because $GITHUB_REF don't exist in this level.
+    if: github.ref == 'refs/heads/main'
+    # if: $GITHUB_REF == 'refs/heads/main' will not work
+    env:
+      JOB_LEVEL_ENV: Available to all steps in env-vars-and-context job
+    steps:
+      # In this case is evaluated in the runner machine
+      - name: Log ENV VAR
+        run: echo $GITHUB_REF
+      # In this case is evaluated by Github Actions before and sended to the runner machine once evaluated.
+      - name: Log Context
+        run: echo '${{ github.ref }}'
+      - name: Log Custom ENV Vars
+        env: 
+          STEP_LEVEL_ENV: Only Available to only this step
+          WF_LEVEL_ENV: Overriden in step
+        run: |
+          echo '${{ env.STEP_LEVEL_ENV }}'
+          echo $STEP_LEVEL_ENV
+          echo $WF_LEVEL_ENV
+          echo $JOB_LEVEL_ENV   
+```
+
+### Evaluation of environment variables
+
+We can use environment variables in 2 different ways. 
+- $NAME_OF_VARIABLE. If we use this way the variable is evaluated inside the running machine.
+- ${{ env.NAME_OF_VARIABLE }}. If we use this other method the variable is evaluated in Github Actions and then passed to the running machine. Using this method we can use environment variables inside **if** tag in the yaml.
