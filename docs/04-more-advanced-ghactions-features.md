@@ -60,6 +60,9 @@ Stablish a number of minutes for stopping the execution of our workflow. For exa
 This can be set also at job level (so the time corresponds to the full job)
 
 ## Running a Job Multiple Times Using a Mtrix
+If you need to run the job multiple times you can define a matrix and the job will be executed multiple times.
+
+
 ## INcluding & Excluding Matrix Configurations
 ## Hanling Failing Jobs in a Matrix
 ## Step and Job Outputs & Dynamic Matrices
