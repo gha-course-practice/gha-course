@@ -312,5 +312,36 @@ Example in powershell
 
 [TO DO]
 
+### Secrets and variables
 
+You can configure secrets and variables at 3 levels:
+- Organization Level. If you configure secrets or variables at organization level you can access this secrets or variables in any repository inside the organization.
+- Repository Level. So you can access this variable or secret in any workflow. If we define a variable or secret that was defined in the organization level in Repository level we are overriding the value for this repository.
+- Environment Level: same as both before. For accesing variables created at environment level you need to specify an environment in the workflow yaml file.
 
+Example of using:
+
+```yaml
+name: Variables and Secrets
+on: [push]
+
+jobs:
+  log-vars:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    environment: 'staging'
+    env:
+        BOOLEAN_SECRET: ${{ secrets.BOOLEAN_SECRET }}
+        ENV_LEVEL_VAR: ${{ vars.ENV_LEVEL_VAR }}
+        REPO_LEVEL_VAR: ${{ vars.REPO_LEVEL_VAR }}
+        ORG_LEVEL_VAR: ${{ vars.ORG_LEVEL_VAR }}
+    steps:
+      - name: Run only if BOOLEAN_SECRET is true
+        if: env.BOOLEAN_SECRET == 'true'
+        run: echo "I ran only when BOOLEAN_SECRET is true"
+      - name: Log vars
+        run: |
+          echo '${{ vars.JOBS_RUNNER }}'
+          echo "ORG_LEVEL_VAR: $ORG_LEVEL_VAR"
+          echo "REPO_LEVEL_VAR: $REPO_LEVEL_VAR"
+          echo "ENV_LEVEL_VAR: $ENV_LEVEL_VAR" 
+```
