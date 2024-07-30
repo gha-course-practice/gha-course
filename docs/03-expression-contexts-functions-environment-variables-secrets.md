@@ -388,3 +388,28 @@ jobs:
         run:
           cat $HOME/secrets/secret.json
 ```
+
+
+
+## Permissions
+
+We can stablish the permissions that the GITHUB_TOKEN will have inside github with the **permissions** key:
+
+```yaml
+
+jobs:
+    pr-comment:
+        runs-on: ubuntu-latest
+        # when we specify one or more permissions all the other will be set to none.
+        permissions:
+            pull-requests: write
+        # permissions: read-all or permissions: write-all or {} for no permissions
+
+```
+
+The token will have only the permissions that we specify, and all the other ones will be set to None.
+
+We can configure the permissions at workflow level or at job level.
+
+Heres the link to the [permissions table](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token).
+
