@@ -42,6 +42,21 @@ In this example Step 2 fails. But as we have configured the step with **continue
         run: echo 'Runs on Success'
 ```
 
+### timeout-minutes:
+
+Stablish a number of minutes for stopping the execution of our workflow. For example this step will be cancelled after 1 minute:
+
+```yaml
+    steps:
+      - name: Step 1
+        run: sleep 90
+        timeout-minutes: 1
+      - name: Step 2
+        id: step-2
+        continue-on-error: true
+        run: exit 1
+```
+
 
 ## Running a Job Multiple Times Using a Mtrix
 ## INcluding & Excluding Matrix Configurations
