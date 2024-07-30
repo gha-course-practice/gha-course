@@ -1,4 +1,4 @@
-Name: Matrix
+name: Matrix
 on: [push]
 
 jobs:
