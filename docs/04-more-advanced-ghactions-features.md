@@ -57,6 +57,7 @@ Stablish a number of minutes for stopping the execution of our workflow. For exa
         run: exit 1
 ```
 
+This can be set also at job level (so the time corresponds to the full job)
 
 ## Running a Job Multiple Times Using a Mtrix
 ## INcluding & Excluding Matrix Configurations
