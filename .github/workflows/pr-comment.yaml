@@ -3,13 +3,19 @@ on:
     pull_request_target:
         types: [opened]
 
+        
 jobs:
     pr-comment:
         runs-on: ubuntu-latest
+        # when we specify one or more permissions all the other will be set to none.
+        permissions:
+            issues: read
+        # permissions: read-all or permissions: write-all or {} for no permissions
         steps:
             - name: Comment on new PRs
               uses: actions/github-script@v6
               with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
                 script: |
                     github.rest.issues.createComment({
                         owner: context.repo.owner,

@@ -345,3 +345,46 @@ jobs:
           echo "REPO_LEVEL_VAR: $REPO_LEVEL_VAR"
           echo "ENV_LEVEL_VAR: $ENV_LEVEL_VAR" 
 ```
+
+### Large secrets file
+
+Secrets and variables has a size limit. If you need to have a large amount of secret data you can do this using gpg.
+
+GPG is a tool for encrypt data. What you do is encrypt date locally with the tool. For example, if you want to encrypt the contents of a file "secret.json", you can do it this way:
+
+```powershell
+gpg --symmetric --cipher-algo AES256 secret.json
+```
+--cipher-algo selects cipher algorithm.
+secret.json is the filename
+
+
+This will create a encrypted file called secret.json.gpg with the encrypted data. To decrypt the file locally you can execute:
+
+```powershell
+gpg --decrypt --passphrase="123456" --output decrypted.json .\secret.json.gpg
+```
+
+Here we must provide the passphrase, the output option specifies the output file, and secret.json.gpg is the encrypted file.
+
+To decrypt in the workflow use this:
+
+```yaml
+jobs:
+  decrypt-file:
+    runs-on: ${{ vars.JOBS_RUNNER }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Decrypt file
+        # The passphrase is configured as a secret in the repository
+        env: 
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        # in this step we run gpg to decrypt the file
+        run: |
+          mkdir $HOME/secrets
+          gpg --quiet --batch --yes --decrypt --passphrase="$PASSPHRASE" --output $HOME/secrets/secret.json secret.json.gpg
+        # You shouldn't do this. This is only for testing
+      - name: View Encrypted file contents
+        run:
+          cat $HOME/secrets/secret.json
+```
