@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         # when we specify one or more permissions all the other will be set to none.
         permissions:
-            issues: read
+            issues: write
         # permissions: read-all or permissions: write-all or {} for no permissions
         steps:
             - name: Comment on new PRs
