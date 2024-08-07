@@ -352,9 +352,8 @@ The complete code is this:
       - run: node -v
 ```
 
-
-
 ## Running a Single Job or Workflow at a Time Using Concurrency
+
 ## Reusable Workflows
 ## Reusable Workflows Outputs
 ## Nesting Reusable Workflows
