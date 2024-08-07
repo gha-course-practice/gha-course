@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   node-matrix:
-    continue-on-error: false
+    continue-on-error: ${{ (matrix.experimental == true) || (matrix.os == 'mcxos-latest') }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
