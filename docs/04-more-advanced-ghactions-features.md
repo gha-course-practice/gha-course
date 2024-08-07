@@ -261,8 +261,28 @@ jobs:
     continue-on-error: ${{ (matrix.experimental == true) || (matrix.os == 'macos-latest') }}
 ```
 
-
 ## Step and Job Outputs & Dynamic Matrices
+
+### Step output
+
+We can output values from a step to use in next steps of a job. We do this adding key=value strings to a special file contained in $GITHUB_OUTPUT. Here we have an example. In the first and second step we create outputs in every step
+
+
+```yaml
+jobs:
+  output-values-example:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "step-output=value" >> $GITHUB_OUTPUT
+        id: step-1
+      - run: echo "step-output=value 2" >> $GITHUB_OUTPUT
+        id: step-2
+      - run: |
+          echo '${{ steps.step-1.outputs.step-output }}'
+          echo '${{ steps.step-2.outputs.step-output }}'
+```
+
+
 ## Running a Single Job or Workflow at a Time Using Concurrency
 ## Reusable Workflows
 ## Reusable Workflows Outputs
