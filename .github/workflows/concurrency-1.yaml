@@ -7,7 +7,9 @@ on:
         type: environment
         required: true
 # this can be used at workflow or job level. Here is an example of workflow level
-concurrency: concurrency-group-1
+concurrency: 
+  group: concurrency-group-1
+  cancel-in-progress: true
 jobs:
   sleep:
     runs-on: ubuntu-latest
