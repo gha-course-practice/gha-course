@@ -8,7 +8,8 @@ on:
         required: true
 # this can be used at workflow or job level. Here is an example of workflow level
 concurrency: 
-  group: concurrency-group-1
+  # group: concurrency-group-1
+  group: ${{ github.event.inputs.environment }}
   cancel-in-progress: true
 jobs:
   sleep:
