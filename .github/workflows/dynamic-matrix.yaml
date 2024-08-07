@@ -12,7 +12,7 @@ on:
         type: string
 
 jobs:
-  prepare-matrix:
+  output-values-example:
     runs-on: ubuntu-latest
     steps:
       - run: echo "step-output=value" >> $GITHUB_OUTPUT
@@ -22,7 +22,18 @@ jobs:
       - run: |
           echo '${{ steps.step-1.outputs.step-output }}'
           echo '${{ steps.step-2.outputs.step-output }}'
-
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get all configured options
+        id: matrix-arrays
+        uses: actions/github-script@v6
+        with: 
+          script: "return {os: context.payload.inputs['os'].split(','), 'node-version': context.payload.inputs['node-version'].split(',') }"
+          result-encoding: json
+      - name: Check the values recovered
+        run: echo '${{ steps.matrix-matrix-arrays.outputs.result }}'
+      
   node-matrix:
     strategy:
       matrix:
