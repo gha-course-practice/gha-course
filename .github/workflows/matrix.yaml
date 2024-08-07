@@ -9,24 +9,14 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         node-version: [14, 15, 16]
         include: 
-          # As we have an item of the matrix called "os" with values this don't create a new
-          # dimension for the matrix, only adds the "is-ubuntu: true" to the values of the
-          # matrix that already have ubuntu-latest as the value
           - os: ubuntu-latest
             is-ubuntu: true
-          # But ew don't have any value in the matrix that fits the "os: macos-latest"
-          # So this adds another value for the matrix, and so another execution for the workflow
           - os: macos-latest
             node-version: 15
-          # This don't match any value on the original matrix, so it's added as a value in every combination 
-          # of the original matrix. That means that this is added to os: ubuntu-latest and windows-latest
-          # but not in macos-latest, because this option is not part or the matrix
           - experimental: false
-          # In this case we change the value for experimental in ubuntu-latest with version 16
           - os: ubuntu-latest
             node-version: 16
             experimental: true
-          # As there's not a combination in the matrix for this os and node-version this option is added.
           - os: ubuntu-latest
             node-version: 17
         exclude:

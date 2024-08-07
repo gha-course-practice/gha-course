@@ -2,7 +2,7 @@
 ## Contents
 - Timeout Minutes & Continue on Error
 - Running a Job Multiple Times Using a Mtrix
-- INcluding & Excluding Matrix Configurations
+- Including & Excluding Matrix Configurations
 - Hanling Failing Jobs in a Matrix
 - Step and Job Outputs & Dynamic Matrices
 - Running a Single Job or Workflow at a Time Using Concurrency
@@ -247,12 +247,21 @@ If we make this exclusion we will have this executions:
 You can see we now have one less execution.
 
 
-
-
-
-
-
 ## Hanling Failing Jobs in a Matrix
+
+In the first section we saw how **continue-on-error** tag works in conjungtion with **fail-fast** tag**:
+- **continue-on-error**. Default option is false, and that means that if a job fails Github Actions will cancel all next jobs. In the case of a matrix all not executed combinations will not be executed. Changing this option to true will make that all the jobs will be executed even if some of them fails.
+- **fail-fast**. If this is set to true Github Actions will cancel running jobs when one of the jobs fails.
+
+We can configure this better using the matrix options and their tags. If, for example, we want that jobs with the option **experimental: true** have the **continue-on-error** to true, so all the other jobs will be executed, we can configure this using the matrix context. In this example we allow the jobs to fail if they are experimental or macos.
+
+```yaml
+jobs:
+  node-matrix:
+    continue-on-error: ${{ (matrix.experimental == true) || (matrix.os == 'macos-latest') }}
+```
+
+
 ## Step and Job Outputs & Dynamic Matrices
 ## Running a Single Job or Workflow at a Time Using Concurrency
 ## Reusable Workflows
