@@ -6,7 +6,8 @@ on:
         description: "Environment"
         type: environment
         required: true
-
+# this can be used at workflow or job level. Here is an example of workflow level
+concurrency: concurrency-group-1
 jobs:
   sleep:
     runs-on: ubuntu-latest
