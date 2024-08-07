@@ -32,7 +32,7 @@ jobs:
           script: "return {os: context.payload.inputs['os'].split(','), 'node-version': context.payload.inputs['node-version'].split(',') }"
           result-encoding: json
       - name: Check the values recovered
-        run: echo '${{ steps.matrix-matrix-arrays.outputs.result }}'
+        run: echo '${{ steps.matrix-arrays.outputs.result }}'
       
   node-matrix:
     strategy:
