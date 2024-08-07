@@ -265,7 +265,7 @@ jobs:
 
 ### Step output
 
-We can output values from a step to use in next steps of a job. We do this adding key=value strings to a special file contained in $GITHUB_OUTPUT. Here we have an example. In the first and second step we create outputs in every step
+We can output values from a step to use in next steps of a job. We do this adding key=value strings to a special file contained in $GITHUB_OUTPUT. Here we have an example. In the first and second step we create outputs in every step. We can create more than one output in any step:
 
 
 ```yaml
@@ -275,12 +275,83 @@ jobs:
     steps:
       - run: echo "step-output=value" >> $GITHUB_OUTPUT
         id: step-1
-      - run: echo "step-output=value 2" >> $GITHUB_OUTPUT
+      - run: |
+          echo "type-of-animal=butterfly" >> $GITHUB_OUTPUT
+          echo "color=red" >> $GITHUB_OUTPUT
         id: step-2
       - run: |
           echo '${{ steps.step-1.outputs.step-output }}'
-          echo '${{ steps.step-2.outputs.step-output }}'
+          echo '${{ steps.step-2.outputs.type-of-animal }}'
+          echo '${{ steps.step-2.outputs.color }}'
 ```
+
+In this example we have created one step that has an output with the key **step-output** and the value **value**. Then there is another step that created 2 outputs. The first one is **type-of-animal** which value is **butterfly**, and the second one is **color** with the value **red**.
+
+Then in the last step we access this outputs with the context **steps.id of the step.outputs.key of the output** syntax.
+
+### Job outputs
+
+Step outputs are not available outside of their job. If we need this we must set the job output. Here we have an interesting example:
+
+```yaml
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix-arrays: ${{ steps.matrix-arrays.outputs.result }}
+    steps:
+      - name: Get all configured options
+        id: matrix-arrays
+        uses: actions/github-script@v6
+        with: 
+          script: "return {os: context.payload.inputs['os'].split(','), 'node-version': context.payload.inputs['node-version'].split(',') }"
+          result-encoding: json
+      - name: Check the values recovered
+        run: echo '${{ steps.matrix-arrays.outputs.result }}'
+```
+
+In the **prepare-matrix** jon we find the **outputs** tag. Here we create and output which name is **matrix-arrays** and the value is attached to the output of a step inside the job (which name is **matrix-arrays**).
+
+In this case we used a Github Action (actions/github-script) that allows us to use javascript and returns everything we put in the return sentence. In this special case we convert two comma separated strings in an json object containing two arrays of values.
+
+### Dynamic Matrices
+
+We can then configure a job with a matrix in a dynamic way. 
+
+First thing we need to do is to configure the job for executing after the **prepare-matrix** job, that created de output with the matrix values.
+
+```yaml
+  node-matrix:
+    needs: prepare-matrix
+```
+After that we set our strategy, creating a matrix for every tag:
+
+```yaml
+  node-matrix:
+    needs: prepare-matrix
+    strategy:
+      matrix:
+        os: ${{ fromJson(needs.prepare-matrix.outputs.matrix-arrays).os }}
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix-arrays).node-version }}
+```
+
+The complete code is this:
+
+```yaml
+  node-matrix:
+    needs: prepare-matrix
+    strategy:
+      matrix:
+        os: ${{ fromJson(needs.prepare-matrix.outputs.matrix-arrays).os }}
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix-arrays).node-version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: node -v
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: node -v
+```
+
 
 
 ## Running a Single Job or Workflow at a Time Using Concurrency
