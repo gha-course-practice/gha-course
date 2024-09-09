@@ -382,8 +382,78 @@ Example:
 
 When we want to reuse a workflow we will have one workflow that *calls* the other. The first one, the main workflow, it's known as **Caller workflow**. We will name the other one as the **Called workflow**. The Called workflow and the Caller workflow can be in the same repository, or in a different one. 
 
+### Reusablle *Called* workflow
 
+We can reuse a workflow from the same repository and from another one, but we need to ensure we have configured the corganization or the repository to allow this in Settings -> Actions -> General.
 
+Reusable workflows executes on **workflow_call**, that has a similiar configuration as *workflow_dispatch*, so we can create inputs and secrets that we can use in the every execution inside de workflow. Let's see one example:
+
+```yaml
+name: Reusable Workflow
+on:
+  workflow_call:
+    inputs:
+      name: 
+        description: 'Input description'
+        type: string
+        default: 'Víctor'
+        required: false
+    secrets:
+      access-token: 
+        description: 'Secret description'
+        required: true
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ls -a
+  log-context-and-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display Github Context
+        run: echo '${{ toJSON(github) }}'
+      - name: Display name inputs
+        run: echo '${{ inputs.name }}'
+      - name: Display access-token secret
+        run: echo '${{ secrets.access-token }}'
+```
+
+Let's comment different options:
+1. We use the **workflow_call** event and we configure **inputs** and **secrets**.
+2. In this example we show the github context and the inputs and secrets. This will contain the context and also the inputs and secrets provided by the **caller workflow**.
+
+### *Caller* workflow
+
+In the caller workflow we will use the **uses** key, that we have used in steps fopr using an standard action, but a workflow level. Let's see one example:
+
+```yaml
+name: Calling Reusable Workflows
+on:
+  workflow_dispatch:
+    inputs:
+      name: 
+        description: 'Input description'
+        type: string
+        default: 'Víctor'
+        required: false
+
+jobs:
+  calling-a-resusable-wf:
+    uses: VictorPenya/github-actions-course/.github/workflows/reusable.yaml@main
+    with: 
+      name: ${{ inputs.name }}
+    # secrets: inherit     pass all secrets to the called workflow
+    secrets:
+      access-token: ${{ secrets.ACCESS_TOKEN }}
+```
+
+In the **jobs** section we create a job called *calling-a-reusable-wf* and here we use the *uses* keyword to indicate the workflow. As in the example the *called workflow* resides in another repository we need to provide the complete user-or-organization/repository/route-to-workflow-file path. If we are executing one workflow that is in the same repository we just need to write the local path to this file. For example: ./reusable.yaml if it's in the same folder.
+
+In the example we are providing a branch (*main*), but this is only for an example. In a real environment we will be using one version or one commit ID instead to prevent problems derived from further changes in the workflow.
+
+Once executed this execution will appear in the *caller workflow* repository.
 
 ## Reusable Workflows Outputs
 ## Nesting Reusable Workflows
