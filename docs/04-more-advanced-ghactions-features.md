@@ -354,7 +354,37 @@ The complete code is this:
 
 ## Running a Single Job or Workflow at a Time Using Concurrency
 
+Concurrency can be configured at job or workflow level. We asign a concurrency group tu a workflow or a job, and executions in the same group can only happen one after another, avoiding parallel execution. The syntax is:
+
+```yaml
+concurrency: 
+  group: name-of-the-group
+  cancel-in-progress: true
+```
+
+Github Actions will prevent from executing jobs in the same concurrency group.
+
+If **cancel-in-progress** tag is set to true Github Actions will cancel in progress jobs to execute the last one. If set to false, the first one will be executed and those who are initiaded inside the execution time of the executing job will be cancelled. So if true GH executes the last one, if false, the first one.
+
+We can define concurrency group names dynamically too. Just we must be sure that different workflows don't share the concurrency name. In a very few cases you will be interested in this.
+
+Example:
+
+```yaml
+  concurrency:
+    group: ${{ github.workflow }} - ${{ github.event.inputs.environment }}
+    cancel-in-progress: true
+```
+
+
+
 ## Reusable Workflows
+
+When we want to reuse a workflow we will have one workflow that *calls* the other. The first one, the main workflow, it's known as **Caller workflow**. We will name the other one as the **Called workflow**. The Called workflow and the Caller workflow can be in the same repository, or in a different one. 
+
+
+
+
 ## Reusable Workflows Outputs
 ## Nesting Reusable Workflows
 ## Caching Files in Github Actions

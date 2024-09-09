@@ -1,0 +1,18 @@
+name: Calling Reusable Workflows
+on:
+  workflow_dispatch:
+    inputs:
+      name: 
+        description: 'Input description'
+        type: string
+        default: 'Víctor'
+        required: false
+
+jobs:
+  calling-a-resusable-wf:
+    uses: VictorPenya/github-actions-course/.github/workflows/reusable.yaml@main
+    with: 
+      name: ${{ inputs.name }}
+    # secrets: inherit     pass all secrets to the called workflow
+    secrets:
+      access-token: ${{ secrets.ACCESS_TOKEN }}
