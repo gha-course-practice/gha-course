@@ -533,8 +533,21 @@ jobs:
       - run: echo ${{ needs.calling-a-reusable-wf-in-the-same-repo.outputs.date }}
 ```
 
-
 ## Nesting Reusable Workflows
+Nesting workflows is the capability of calling a workflow inside a called workflow. There are two main important ideas that we need to understand:
+
+1. Secrets and inputs must be provided in the call. If a workflow have inputs or secrets these must be provided by the caller workflow. You can inherit the inputs and secrets with the inherit keyword:
+
+```yaml
+jobs:
+  calling-a-reusable-wf-in-the-same-repo:
+    uses: ./.github/workflows/reusable-workflow.yaml
+    # Pass all secrets to the called workflow
+    secrets: inherit
+```
+
+2. Permissions of the called workflow are limited by those that the caller one has. A inherited workflow couldn't scale or increase permissions.
+
 ## Caching Files in Github Actions
 ## Updating Cache Keys Dinamically && Adding Restore Keys
 ## Cache Limits & Restrictions
