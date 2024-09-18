@@ -456,6 +456,84 @@ In the example we are providing a branch (*main*), but this is only for an examp
 Once executed this execution will appear in the *caller workflow* repository.
 
 ## Reusable Workflows Outputs
+
+We can configure workflow level outputs that can be recovered from a called workflow for use in the caller one. 
+
+To do so, in the reusable workflow (the called one), we must create first of all a step Output. We do this copying the value in the file contained in $GITHUB_OUTPUT environment variable:
+
+```yaml
+    steps:
+      # Create the variable "date", that contains a value of the execution date, and save it to $GITHUB_OUTPUT file
+      - run: echo "date=$(date)" > $GITHUB_OUTPUT 
+        id: date-step       # Create an id for the step so can be referenced later
+```
+
+The we create a job level output containing the "date" variable:
+
+```yaml
+jobs:
+  generate-output:
+    runs-on: ubuntu-latest
+    # Here we have the job output
+    outputs:
+      # We return de date variable from date-step step
+      date: ${{ steps.date-step.outputs.date }}
+```
+
+And then we can set the output at workflow level, using the output of this job. It's done as in the following example:
+
+```yaml
+name: Reusable Workflow
+on:
+  # This workflow is executed when it's called
+  workflow_call:
+    # Workflow level output, same as inputs
+    outputs:
+      date: 
+        description: 'Date Value'
+        # We access the context to recover the variable date from the job's outputs
+        value: ${{ jobs.generate-output.outputs.date }}
+```
+
+This is the complete code of the reusable workflow that has outputs:
+
+```yaml
+name: Reusable Workflow
+on:
+  workflow_call:
+    outputs:
+      date: 
+        description: 'Date Value'
+        value: ${{ jobs.generate-output.outputs.date }}
+
+jobs:
+  generate-output:
+    runs-on: ubuntu-latest
+    outputs:
+      date: ${{ steps.date-step.outputs.date }}
+    steps:
+      - run: echo "date=$(date)" > $GITHUB_OUTPUT 
+        id: date-step
+```
+
+Here's an example of how to recover the output variable and use it in the caller workflow:
+
+```yaml
+jobs:
+  # In this job we call the reusable workflow. It's in the local repo
+  calling-a-reusable-wf-in-the-same-repo:
+    uses: ./.github/workflows/reusable-workflow.yaml
+  # Here we will use the optput
+  using-reusable-wf-output:
+    runs-on: ubuntu-latest
+    # Firts: we must wait from previous job to finish so we have the output
+    needs: calling-a-reusable-wf-in-the-same-repo
+    steps:
+      # In the context, in the needs object, we can access outputs of needed steps
+      - run: echo ${{ needs.calling-a-reusable-wf-in-the-same-repo.outputs.date }}
+```
+
+
 ## Nesting Reusable Workflows
 ## Caching Files in Github Actions
 ## Updating Cache Keys Dinamically && Adding Restore Keys
