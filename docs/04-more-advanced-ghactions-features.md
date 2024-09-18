@@ -549,6 +549,79 @@ jobs:
 2. Permissions of the called workflow are limited by those that the caller one has. A inherited workflow couldn't scale or increase permissions.
 
 ## Caching Files in Github Actions
+
+When we use a tool like npm to manage our dependencies in the local machine we have all the dependencies cached in our machine, so the amount of time needed to install dependencies are reduced. The problema with Github Actions is that usually de dependencies folder are not syncrhronized with the github repository (because we put this folder inside .gitignore file). That means that everytime we use an action for deploy our code we need to install all dependencies, and that will consume a lot of time.
+
+```yaml
+name: Caching and Artifacts
+on: [workflow_dispatch]
+
+job:
+  use-axios:
+    runs-on: ubuntu_latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: rpm install
+      - name: Use Axios
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const axios = require('axios');
+            const res = await axios('https://icanhazdadjoke.com', { headers: { Accept: 'text/plain' } })
+            console.log(res.data)
+```
+
+Everytime we run this workflow all packages will be installed, so nothing is cached. For creating a cache we must add a new step before installing the dependencies. This is made with an action calles **cache**. Here we can see one example:
+
+```yaml
+name: Caching and Artifacts
+on: [workflow_dispatch]
+
+job:
+  use-axios:
+    runs-on: ubuntu_latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache node modules
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with: 
+          path: ~/.npm
+          key: "npm-cache"
+      - name: Display Cache Output
+        run: echo '${{ toJSON(steps.cache-dependencies.outputs) }}'
+      - name: Install dependencies
+        run: rpm install
+      - name: Use Axios
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const axios = require('axios');
+            const res = await axios('https://icanhazdadjoke.com', { headers: { Accept: 'text/plain' } })
+            console.log(res.data)
+```
+
+First we create one step to create the cache of our libraries. This is made by the action **actions/cache**. In this extension documentation we can see the path and key needed for every case. In the example we use npm in a linux environment:
+
+```yaml
+      - name: Cache node modules
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with: 
+          path: ~/.npm
+          key: "npm-cache"
+```
+
+We can access the outputs of the cache step to see that everything worked fine:
+
+```yaml
+      - name: Display Cache Output
+        run: echo '${{ toJSON(steps.cache-dependencies.outputs) }}'
+```
+
+This is simply made with the context.
+
 ## Updating Cache Keys Dinamically && Adding Restore Keys
 ## Cache Limits & Restrictions
 ## Uploading & Downloading Job Artifacts
