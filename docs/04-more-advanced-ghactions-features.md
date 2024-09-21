@@ -623,6 +623,80 @@ We can access the outputs of the cache step to see that everything worked fine:
 This is simply made with the context.
 
 ## Updating Cache Keys Dinamically && Adding Restore Keys
+
+We need to chenge the key everytime the dependencies change. For a JS project we have this dependencies in the file package-lock.json (if we use npm). One way to solve this is to change the static key for a dinamic one that will be created everytime we change the package-lock.json file. This can be donde with an expression, as shown in the example: 
+
+```yaml
+with:
+  path: ~/.npm
+  key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+```
+
+**hashFiles** function creates a hash for the content of the file. With this solucion everytime the contents of the file changes, because dependencies are chenged, a new cache key is created automatically. We can improve this, for example, addind the operating system in the expression:
+
+```yaml
+with:
+  path: ~/.npm
+  key: ${{ runner.os }}npm-cache-${{ hashFiles('**/package-lock.json') }}
+```
+
+We can provide keys for those situations where the cache is not found with the generated key. This is donde with de **restore-keys** option., Let's see one example:
+
+```yaml
+with:
+  path: ~/.npm
+  key: ${{ runner.os }}npm-cache-${{ hashFiles('**/package-lock.json') }}
+  restore_keys:
+    ${{ runner.os }}-npm-cache-
+    ${{ runner.os }}-
+```
+
+What happens when dependencies are changed in this scenario? First the workflow will look for a existing cache with the new calculated name. If it's not found then will look for a cache starting with the firt rule. In this case, a cache that starts with linux-npm-cache. If there is not a cache that matches the first rule, then will search for the second rule... Once one cache is founded the workflow will use this cache, run, and in the end create a new cache with de new name, so in next executions the new cache can be used.
+
+Some actions control all the caching for you.
+
 ## Cache Limits & Restrictions
+
+- Github will remove any cache not used in 7 days.
+- Sizer limit es 10 GB
+
+When we create child branches these child branches can acces the main branch caches, but not in the other direction (parent branches can't access child branches caches). And also different branches that are not related can't access caches between them.
+
+Caches created on pull request will live only in the branch that are beeing pool. It's very important to clean this pull request caches frequently so we free space. We must have in mind the 10 Gb limit.
+
+More information can be found in the [documentation](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#managing-caches). 
+
+
 ## Uploading & Downloading Job Artifacts
+
+Artifact are similar to caching, but are use for different reasons. Caching is for files that don't change between workflow execution. Artifacts are used to save failes that are produced by a job (logs, test results...).
+
+In the example we have an step to do the tests and we want to recover the report
+
+```yaml
+- name: Run Tests
+  run: npm test
+
+- name: Uploda Code Coverage Report
+  uses: actions/upload-artifact@v3
+  if: always()
+  with:
+    name: code-coverage
+    path: coverage
+    retention-days: 10   # by default, 90 days
+```
+
+The **upload-artifact** do the job of saving the files in the artifact. 
+
+We can download the artifact in another step with this action:
+
+```yaml
+- name: Downlkoad Code Coverage
+  uses: actions/download-artifact@v3
+  with:
+    name: code-coverage
+    path: code-coverage-report
+```
+
+Here we downloaded the previously created artifact in a folder called **code-coverage-report**.
 
