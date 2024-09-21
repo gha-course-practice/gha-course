@@ -700,3 +700,4 @@ We can download the artifact in another step with this action:
 
 Here we downloaded the previously created artifact in a folder called **code-coverage-report**.
 
+More documentation can be found [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow#passing-data-between-jobs-in-a-workflow).
